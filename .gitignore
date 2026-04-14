@@ -1,0 +1,9 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.swp
+Directory.Build.props
+audio.sample.json
