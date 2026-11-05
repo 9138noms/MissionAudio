@@ -12,6 +12,10 @@ Nuclear Option BepInEx plugin that adds a **"Play Audio"** outcome type to the m
 - Auto-stops on mission unload / main menu return
 - Graceful fallback: vanilla clients without the mod see a no-op `ShowMessage` outcome (no audio, no text glitches)
 
+## Requirements
+- Nuclear Option **0.34** — v1.0.1 is built and tested on 0.34.6. v1.0.0 does not work on this version: it was built against the game's old `SavedMission.ObjectiveV2` API, which no longer exists.
+- **BepInEx** 5.x
+
 ## Installation
 1. Requires **BepInEx** (5.x or compatible) already set up for Nuclear Option.
 2. Extract the release zip into `<Nuclear Option>/`. Resulting layout:
@@ -47,7 +51,7 @@ When the objective completes at runtime, the selected audio plays. Map/config is
 
 ## Troubleshooting
 BepInEx log (`BepInEx/LogOutput.log`) contains:
-- `MissionAudio v1.0.0 loaded. Library: ... (N files)` — plugin initialized
+- `MissionAudio v1.0.1 loaded. Library: ... (N files)` — plugin initialized
 - `MissionAudio: played 'X' vol=Y` — audio fired
 - `MissionAudio: auto-created N entry/entries ...` — mission had Play Audio outcomes but audio.json was missing/stale; entries defaulted to the first library file
 - `MissionAudio: load failed ...` — audio file format issue (try re-encoding to 16-bit PCM WAV or 128kbps MP3)
@@ -65,11 +69,11 @@ LogLevels = All
 
 ## Build from source
 ```
-dotnet build -c Release
+dotnet build -c Release -p:NuclearOptionDir="C:\Program Files (x86)\Steam\steamapps\common\Nuclear Option"
 ```
-Output: `bin/Release/net472/MissionAudio.dll`.
+Output: `bin/Release/net472/MissionAudio.dll`. The `-p:NuclearOptionDir=` argument can be omitted if the game is at that default Steam path.
 
-Requires .NET SDK and Nuclear Option installed at the default Steam path (or edit `MissionAudio.csproj` HintPaths).
+The game's assemblies and BepInEx are referenced from your install, never copied into this repository.
 
 ## License
 MIT. See [LICENSE](LICENSE).

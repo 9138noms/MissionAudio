@@ -12,8 +12,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using NuclearOption.MissionEditorScripts;
 using NuclearOption.SavedMission;
-using NuclearOption.SavedMission.ObjectiveV2;
-using NuclearOption.SavedMission.ObjectiveV2.Outcomes;
+using NuclearOption.SavedMission.Outcomes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -53,7 +52,7 @@ namespace MissionAudio
         }
     }
 
-    [BepInPlugin("com.noms.missionaudio", "MissionAudio", "1.0.0")]
+    [BepInPlugin("com.noms.missionaudio", "MissionAudio", "1.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         internal const string OUTCOME_PREFIX = "__MA__";
@@ -117,7 +116,7 @@ namespace MissionAudio
             MissionManager.onMissionLoad += OnMissionLoad;
 
             new Harmony("com.noms.missionaudio").PatchAll();
-            Log.LogInfo($"MissionAudio v1.0.0 loaded. Library: {AudioLibraryDir} ({AudioLibrary.Count} files)");
+            Log.LogInfo($"MissionAudio v1.0.1 loaded. Library: {AudioLibraryDir} ({AudioLibrary.Count} files)");
         }
 
         internal static void RefreshLibrary()
@@ -514,8 +513,10 @@ namespace MissionAudio
                 string baseName = string.IsNullOrWhiteSpace(nameField?.text) ? "audio" : nameField.text.Trim();
                 string uname = Plugin.OUTCOME_PREFIX + baseName;
 
-                var outcome = new ShowMessageOutcome();
-                outcome.LoadNew(new SavedOutcome(uname, OutcomeType.ShowMessage));
+                // Outcome.LoadNew and the SavedOutcome(name, type) constructor no longer exist.
+                // Build the outcome the same way NewOutcomePanel.CreateItem does.
+                var outcome = (ShowMessageOutcome)SavedOutcome.Create(
+                    SavedOutcome.CreateSaved(OutcomeType.ShowMessage, uname));
                 outcome.Message = "";
                 outcome.PlaySound.SetValue(false, null);
 
@@ -526,8 +527,8 @@ namespace MissionAudio
                 Plugin.GetOrCreateEntry(outcome.SavedOutcome.UniqueName);
                 Plugin.SaveSidecar();
 
-                var editor = SceneSingleton<MissionEditor>.i;
-                editor?.CheckAutoSave();
+                // CheckAutoSave became static and now takes the reason for the save.
+                MissionEditor.CheckAutoSave(EditorMissionGroup.AutoSaveType.Timed);
 
                 var sidePanel = panel.Panel;
                 sidePanel?.Parent?.Refresh();
